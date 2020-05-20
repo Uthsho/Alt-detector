@@ -13,12 +13,9 @@ def get_prefix(bot, message):
   cursor = db.cursor()
   cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {message.guild.id}")
   result = cursor.fetchone()
-  if result == None:
-    return "ad!"
-  elif result is not None:
-    return result
+  return result
 	
-bot = commands.Bot(command_prefix = get_prefix)
+bot = commands.Bot(command_prefix = "ad!")
 start_time = time.time()
 bot.remove_command('help')
 
@@ -373,28 +370,23 @@ async def setnotify_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
         await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
 
-'''
 @bot.command()
 @commands.has_permissions(administrator = True)
-async def prefix(ctx, prefix):
+async def setprefix(ctx, prefix = None):
   db = sqlite3.connect("db.sqlite")
   cursor = db.cursor()
-  cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {ctx.guild.id}")
+  cursor.execute(f"SELECT channel_id FROM main WHERE guild_id = {member.guild.id}")
   result = cursor.fetchone()
-  if result is None:
-    sql = ("INSERT INTO main(guild_id, prefix) VALUES(?, ?)")
-    val = (ctx.guild.id, prefix)
-    await ctx.send(f'Prefix has been set to `{prefix}`')
-  elif result is not None:
+  if prefix is None:
+    await ctx.send(f'{ctx.author.mention} the current prefix for this server is `{result}`.')
+  elif prefix is not None:
     sql = ("UPDATE main SET prefix = ? WHERE guild_id = ?")
     val = (prefix, ctx.guild.id)
-    await ctx.send(f'Prefix has been updated to `{prefix}`')
-  cursor.execute(sql, val)
-  db.commit()
-  cursor.close()
-  db.close()
-'''
-
+    await ctx.send(f'{ctx.author.mention} the prefix has been successfully set to `{prefix}`')
+    cursor.execute(sql, val)
+    db.commit()
+    cursor.close()
+    db.close()
 
 @bot.command()
 @commands.has_permissions(administrator = True)
