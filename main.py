@@ -15,11 +15,11 @@ def get_prefix(bot, message):
   result = cursor.fetchone()
   return result
 	
-bot = commands.Bot(command_prefix = "ad!")
+bot = commands.Bot(command_prefix = get_prefix)
 start_time = time.time()
 bot.remove_command('help')
 
-cogs = ['cogs.Help_command', 'cogs.rebl_only', 'cogs.rolemen', 'cogs.uptime', 'cogs.eval']
+cogs = ['cogs.Help_command', 'cogs.rebl_only', 'cogs.rolemen', 'cogs.uptime', 'cogs.eval', 'cogs.mod']
 
 @bot.event
 async def on_ready():
@@ -34,13 +34,6 @@ async def on_ready():
 async def on_message(message):
   if message.author == bot.user:
     return
-  """if message.content == "?dings":
-    if message.guild.id == 366149031103168512:
-      guild = message.guild
-      dings = guild.get_member(int(363298519941120000))
-      rebl = guild.get_member(int(428185775910420480))
-      await dings.edit(nick = "Im the cutest here")
-      await rebl.edit(nick = "4041RebL")"""
   await bot.process_commands(message)
 
 @bot.event
@@ -51,6 +44,7 @@ async def on_command(ctx):
   embed = discord.Embed()
   embed.set_author(name = ctx.author, icon_url = ctx.author.avatar_url)
   embed.add_field(name = "Server name:", value = ctx.guild.name, inline = False)
+  embed.add_field(name = "Server ID", value = ctx.guild.id, inline = False)
   embed.add_field(name = "Command Name:", value = CmdName, inline = False)
   embed.add_field(name = "Arguments Passed:", value = argums, inline = False)
   embed.add_field(name = "Failure?", value = result, inline = False)
@@ -90,12 +84,12 @@ async def on_member_join(member):
   cursor = db.cursor()
   cursor.execute(f"SELECT channel_id FROM main WHERE guild_id = {member.guild.id}")
   result = cursor.fetchone()
-  if result:
+  if result[0] is not None:
     #cursor.execute(f"SELECT muted_role FROM main WHERE guild_id = {member.guild.id}")
     #result1 = cursor.fetchone()
     cursor.execute(f"SELECT notify FROM main WHERE guild_id = {member.guild.id}")
     result2 = cursor.fetchone()
-    if result2:
+    if result2[0] is not None:
       embed = discord.Embed(color = random.choice(ListColours))
       embed.set_thumbnail(url = f'{member.avatar_url}')
       embed.add_field(name = "Server username:", value = f"{member}")
@@ -117,7 +111,7 @@ async def on_member_join(member):
       #muted_role = guild.get_role(int(result1[0]))
       cursor.execute(f"SELECT alt_age FROM main WHERE guild_id = {member.guild.id}")
       result3 = cursor.fetchone()
-      if result3:
+      if result3[0] is not None:
         altage = int(result3[0])
         if member_age <= altage:
           if notify_role.mentionable:
@@ -191,7 +185,7 @@ async def on_member_join(member):
       #notify_role = guild.get_role(int(result2[0]))
       cursor.execute(f"SELECT alt_age FROM main WHERE guild_id = {member.guild.id}")
       result3 = cursor.fetchone()
-      if result3:
+      if result3[0] is not None:
         altage = int(result3[0])
         if member_age <= altage:
           embed.set_author(name = f"Suspicious! Account age less than {altage} days!")
@@ -375,10 +369,10 @@ async def setnotify_error(ctx, error):
 async def setprefix(ctx, prefix = None):
   db = sqlite3.connect("db.sqlite")
   cursor = db.cursor()
-  cursor.execute(f"SELECT channel_id FROM main WHERE guild_id = {member.guild.id}")
+  cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {ctx.guild.id}")
   result = cursor.fetchone()
   if prefix is None:
-    await ctx.send(f'{ctx.author.mention} the current prefix for this server is `{result}`.')
+    await ctx.send(f'{ctx.author.mention} the current prefix for this server is `{result[0]}`.')
   elif prefix is not None:
     sql = ("UPDATE main SET prefix = ? WHERE guild_id = ?")
     val = (prefix, ctx.guild.id)
@@ -662,25 +656,44 @@ async def members(ctx, *, role: discord.Role):
       count += 1
 
 @bot.command()
-async def check(self, ctx, guild: discord.Guild):
-	if ctx.author.id == 428185775910420480:
-		server = bot.get_guild(guild)
-		db = sqlite3.connect("db.sqlite")
-		cursor = db.cursor()
-		cursor.execute(f"SELECT channel_id FROM main WHERE guild_id = {server.id}")
-		channel = cursor.fetchone()
-		cursor.execute(f"SELECT notify FROM main WHERE guild_id = {server.id}")
-		notify = cursor.fetchone()
-		cursor.execute(f"SELECT alt_age FROM main WHERE guild_id = {server.id}")
-		alt_age = cursor.fetchone()
-		embed = discord.Embed(color = random.choice(ListColours))
-		embed.set_author(name = server.name)
-		embed.set_thumbnail(url = server.icon_url)
-		embed.add_field(name = "Feeds Channel:", value = channel.mention)
-		embed.add_field(name = "Notify role:", value = notify.mention)
-		embed.add_field(name = "Alt age:", value = alt_age)
-		await ctx.send(embed = embed)
+async def check(ctx, id: int):
+		if ctx.author.id == 428185775910420480:
+			guild = bot.get_guild(id)
+			db = sqlite3.connect("db.sqlite")
+			cursor = db.cursor()
+			cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {guild.id}")
+			prefix_raw = cursor.fetchone()
+			prefix = prefix_raw[0]
+			cursor.execute(f"SELECT channel_id FROM main WHERE guild_id = {guild.id}")
+			channel_id = cursor.fetchone()
+			cursor.execute(f"SELECT notify FROM main WHERE guild_id = {guild.id}")
+			notify_id = cursor.fetchone()
+			cursor.execute(f"SELECT alt_age FROM main WHERE guild_id = {guild.id}")
+			alt_age = cursor.fetchone()
 
+			if channel_id[0]:
+				channel = guild.get_channel(int(channel_id[0])).mention
+			else:
+				channel = "Not Set"
+
+			if notify_id[0]:
+				notify = guild.get_role(int(notify_id[0])).mention 
+			else:
+				notify = "Not Set"
+
+			if alt_age[0]:
+				age = alt_age[0]
+			else:
+				age = "7(default)"
+
+			embed = discord.Embed()
+			embed.set_author(name = guild.name)
+			embed.set_thumbnail(url = guild.icon_url)
+			embed.add_field(name = "Prefix:", value = prefix, inline = False)
+			embed.add_field(name = "Feeds Channel:", value = channel, inline = False)
+			embed.add_field(name = "Notify role:", value = notify, inline = False)
+			embed.add_field(name = "Alt age:", value = age, inline = False)
+			await ctx.send(embed = embed)
 
 keep_alive()
 token = os.environ.get("TOKEN")

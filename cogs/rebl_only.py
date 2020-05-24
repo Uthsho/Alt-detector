@@ -85,7 +85,7 @@ class rebl_only(commands.Cog):
 	@commands.command()
 	async def cmd(self, ctx):
 		if ctx.author.id == 428185775910420480:
-			embed = discord.Embed(title = "Owner only commands", colour = random.choice(ListColours), description = "`guilds`, `guildinfo`, `leaveguild`, `newver`.")
+			embed = discord.Embed(title = "Owner only commands", colour = random.choice(ListColours), description = "`guilds`, `guildinfo`, `leaveguild`, `newver`, `check`, `update`, `whois404`, `fetchalts404`")
 			await ctx.send(embed = embed)
 		else:
 			return

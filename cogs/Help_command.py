@@ -37,10 +37,24 @@ class Help_command(commands.Cog):
   	helpembed = discord.Embed(title = 'Help', colour = random.choice(ListColours), description = "Do `help [command_name]` for further help on various commands.")
   	helpembed.set_thumbnail(url = self.bot.user.avatar_url)
   	helpembed.add_field(name = "Log commands:", value = '`setchannel`: Set joins log channel.\n`setnotify`: Sets the role to be notified when suspicious accounts join the server.\n`setage`: Sets the number of days by which the bot identifies any account as alt.', inline = False)
-  	helpembed.add_field(name = "Moderation commands:", value = "`fetchalts`: Get a list of alts hiding in your server!\n`whois`: Use this command to know the account information.\n`rolemen`: Get a list of roles which can be mentioned by everyone.", inline = False)
-  	helpembed.add_field(name = "Misc commands:", value = '`invite`: Invite the bot to your server.\n`botinfo`: Information about the bot.\n`knownerrors`: Find out about the common errors.\n`ping`: Shows the latency of the bot.\n`uptime`: Shows the uptime of the bot.', inline = False)
+  	helpembed.add_field(name = "Moderation commands:", value = "`fetchalts`: Get a list of alts hiding in your server!\n`whois`: Use this command to know the account information.\n`rolemen`: Get a list of roles which can be mentioned by everyone.\n`ban`: Ban members with optional reason.\n`kick`: Kick users with optional reason", inline = False)
+  	helpembed.add_field(name = "Misc commands:", value = '`setprefix`: Change the prefix of the bot for this server.\n`invite`: Invite the bot to your server.\n`botinfo`: Information about the bot.\n`knownerrors`: Find out about the common errors.\n`ping`: Shows the latency of the bot.\n`uptime`: Shows the uptime of the bot.', inline = False)
   	helpembed.add_field(name = "Note:", value = "The bot does not have any start or initiate command, as soon as the log channel and notify roles are setup, the bot will start logging.", inline = False)
   	await ctx.send(embed = helpembed)
+
+  @help.command()
+  async def kick(self, ctx):
+    embed = discord.Embed(title = "kick <member> [reason]", colour = random.choice(ListColours), descriptipon = "`<member>` can be replaced by both ID, and mention.\n`[reason] is an optional field.")
+    embed.set_thumbnail(url = self.bot.user.avatar_url)
+    embed.add_field(name = 'Note: DO NOT include the [] brackets', value = 'For example:\nad!kick <@!428185775910420480> Example or\nad!kick 428185775910420480 Example')
+    await ctx.send(embed = embed)
+
+  @help.command()
+  async def ban(self, ctx):
+    embed = discord.Embed(title = "ban <member> [reason]", colour = random.choice(ListColours), descriptipon = "`<member>` can be replaced by both ID, and mention.\n`[reason] is an optional field.")
+    embed.set_thumbnail(url = self.bot.user.avatar_url)
+    embed.add_field(name = 'Note: DO NOT include the [] brackets', value = 'For example:\nad!ban <@!428185775910420480> Example or\nad!ban 428185775910420480 Example')
+    await ctx.send(embed = embed)
 
   @help.command()
   async def setchannel(self, ctx):
