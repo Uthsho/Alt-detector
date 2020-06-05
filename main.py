@@ -9,11 +9,14 @@ import asyncio
 import time
 
 def get_prefix(bot, message):
-  db = sqlite3.connect("db.sqlite")
-  cursor = db.cursor()
-  cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {message.guild.id}")
-  result = cursor.fetchone()
-  return result
+	db = sqlite3.connect("db.sqlite")
+	cursor = db.cursor()
+	cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {message.guild.id}")
+	result = cursor.fetchone()
+	if result:
+		return result[0]
+	else:
+		return "ad!"
 	
 bot = commands.Bot(command_prefix = get_prefix)
 start_time = time.time()
@@ -23,210 +26,154 @@ cogs = ['cogs.Help_command', 'cogs.rebl_only', 'cogs.rolemen', 'cogs.uptime', 'c
 
 @bot.event
 async def on_ready():
-  status1 = discord.Status.dnd
-  Game = discord.Game("ad!help for help! Check ad!knownerrors for common errors troubleshooting.")
-  await bot.change_presence(status = status1, activity = Game)
-  print("The bot is ready!")
-  for cog in cogs:
-    bot.load_extension(cog)
+	status1 = discord.Status.dnd
+	Game = discord.Game("ad!help for help! Check ad!knownerrors for common errors troubleshooting.")
+	await bot.change_presence(status = status1, activity = Game)
+	print("The bot is ready!")
+	for cog in cogs:
+		bot.load_extension(cog)
 
 @bot.event
 async def on_message(message):
-  if message.author == bot.user:
-    return
-  await bot.process_commands(message)
+	if message.author == bot.user:
+		return
+	await bot.process_commands(message)
 
 @bot.event
 async def on_command(ctx):
-  CmdName = ctx.command
-  argums = ctx.args
-  result = ctx.command_failed
-  embed = discord.Embed()
-  embed.set_author(name = ctx.author, icon_url = ctx.author.avatar_url)
-  embed.add_field(name = "Server name:", value = ctx.guild.name, inline = False)
-  embed.add_field(name = "Server ID", value = ctx.guild.id, inline = False)
-  embed.add_field(name = "Command Name:", value = CmdName, inline = False)
-  embed.add_field(name = "Arguments Passed:", value = argums, inline = False)
-  embed.add_field(name = "Failure?", value = result, inline = False)
-  guild = bot.get_guild(699290773799305298)
-  channel = guild.get_channel(710535283036127304)
-  await channel.send(embed = embed)
+	CmdName = ctx.command
+	argums = ctx.args
+	result = ctx.command_failed
+	embed = discord.Embed()
+	embed.set_author(name = ctx.author, icon_url = ctx.author.avatar_url)
+	embed.add_field(name = "Server name:", value = ctx.guild.name, inline = False)
+	embed.add_field(name = "Server ID", value = ctx.guild.id, inline = False)
+	embed.add_field(name = "Command Name:", value = CmdName, inline = False)
+	embed.add_field(name = "Arguments Passed:", value = argums, inline = False)
+	embed.add_field(name = "Failure?", value = result, inline = False)
+	guild = bot.get_guild(699290773799305298)
+	channel = guild.get_channel(710535283036127304)
+	await channel.send(embed = embed)
 
 ListColours = [
-    discord.Colour.blue(), 
-    discord.Colour.teal(), 
-    discord.Colour.dark_teal(), 
-    discord.Colour.green(), 
-    discord.Colour.dark_green(), 
-    discord.Colour.blue(), 
-    discord.Colour.dark_blue(), 
-    discord.Colour.purple(), 
-    discord.Colour.dark_purple(), 
-    discord.Colour.magenta(), 
-    discord.Colour.dark_magenta(), 
-    discord.Colour.gold(), 
-    discord.Colour.dark_gold(), 
-    discord.Colour.orange(), 
-    discord.Colour.dark_orange(), 
-    discord.Colour.red(), 
-    discord.Colour.dark_red(), 
-    discord.Colour.lighter_grey(), 
-    discord.Colour.dark_grey(), 
-    discord.Colour.light_grey(), 
-    discord.Colour.darker_grey(), 
-    discord.Colour.blurple(), 
-    discord.Colour.greyple(), 
-    ]
+		discord.Colour.blue(), 
+		discord.Colour.teal(), 
+		discord.Colour.dark_teal(), 
+		discord.Colour.green(), 
+		discord.Colour.dark_green(), 
+		discord.Colour.blue(), 
+		discord.Colour.dark_blue(), 
+		discord.Colour.purple(), 
+		discord.Colour.dark_purple(), 
+		discord.Colour.magenta(), 
+		discord.Colour.dark_magenta(), 
+		discord.Colour.gold(), 
+		discord.Colour.dark_gold(), 
+		discord.Colour.orange(), 
+		discord.Colour.dark_orange(), 
+		discord.Colour.red(), 
+		discord.Colour.dark_red(), 
+		discord.Colour.lighter_grey(), 
+		discord.Colour.dark_grey(), 
+		discord.Colour.light_grey(), 
+		discord.Colour.darker_grey(), 
+		discord.Colour.blurple(), 
+		discord.Colour.greyple(), 
+		]
 
 @bot.event
 async def on_member_join(member):
-  db = sqlite3.connect("db.sqlite")
-  cursor = db.cursor()
-  cursor.execute(f"SELECT channel_id FROM main WHERE guild_id = {member.guild.id}")
-  result = cursor.fetchone()
-  if result[0] is not None:
-    #cursor.execute(f"SELECT muted_role FROM main WHERE guild_id = {member.guild.id}")
-    #result1 = cursor.fetchone()
-    cursor.execute(f"SELECT notify FROM main WHERE guild_id = {member.guild.id}")
-    result2 = cursor.fetchone()
-    if result2[0] is not None:
-      embed = discord.Embed(color = random.choice(ListColours))
-      embed.set_thumbnail(url = f'{member.avatar_url}')
-      embed.add_field(name = "Server username:", value = f"{member}")
-      embed.add_field(name = "Member ID:", value = member.id, inline = False)
-      embed.add_field(name = "Created at:", value = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p"), inline = False)
-      joined_at = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p")
-      precise_member_age = datetime.utcnow() - member.created_at
-      member_age = precise_member_age.days   #in days
-      embed.add_field(name = "Joined at:", value = joined_at, inline = False)
-      year = int(member_age / 365) 
-      month = int((member_age % 365) / 30) 
-      days = (member_age % 365) % 30
-      embed.add_field(name = "Account age:", value = f'{year} year(s), {month} month(s), {days} day(s)')
-      embed.add_field(name = "Join Position:", value = len(list(member.guild.members)), inline = False)
-      embed.set_footer(text = "All times are in GMT to avoid any confusion.")
-      guild = member.guild
-      channel = bot.get_channel(int(result[0]))
-      notify_role = guild.get_role(int(result2[0]))
-      #muted_role = guild.get_role(int(result1[0]))
-      cursor.execute(f"SELECT alt_age FROM main WHERE guild_id = {member.guild.id}")
-      result3 = cursor.fetchone()
-      if result3[0] is not None:
-        altage = int(result3[0])
-        if member_age <= altage:
-          if notify_role.mentionable:
-            embed.set_author(name = f"Suspicious! Account age less than {altage} days!")
-            await channel.send(notify_role.mention, embed = embed)
-          else:
-            await notify_role.edit(mentionable = True)
-            embed.set_author(name = f"Suspicious! Account age less than {altage} days!")
-            await channel.send(notify_role.mention, embed = embed)
-            await notify_role.edit(mentionable = False)
-        elif altage < member_age < 30:
-          embed.set_author(name = "Account age less than 30 days!")
-          await channel.send(embed = embed)
-        elif 90 > member_age >= 30:
-          embed.set_author(name = "This account is older than 1 month.")
-          await channel.send(embed = embed)
-        elif 180 > member_age >= 90:
-          embed.set_author(name = "This account is older than 3 month.")
-          await channel.send(embed = embed)
-        elif 365 > member_age >= 180:
-          embed.set_author(name = "This account is older than 6 month.")
-          await channel.send(embed = embed)
-        else:
-          embed.set_author(name = "This account is older than 1 year.")
-          await channel.send(embed = embed)
-      else:
-        altage = 7
-        if member_age <= altage:
-          if notify_role.mentionable:
-            embed.set_author(name = "Suspicious! Account age less than 1 week!")
-            await channel.send(notify_role.mention, embed = embed)
-          else:
-            await notify_role.edit(mentionable = True)
-            embed.set_author(name = "Suspicious! Account age less than 1 week!")
-            await channel.send(notify_role.mention, embed = embed)
-            await notify_role.edit(mentionable = False)
-        elif altage < member_age < 30:
-          embed.set_author(name = "Account age less than 30 days!")
-          await channel.send(embed = embed)
-        elif 90 > member_age >= 30:
-          embed.set_author(name = "This account is older than 1 month.")
-          await channel.send(embed = embed)
-        elif 180 > member_age >= 90:
-          embed.set_author(name = "This account is older than 3 month.")
-          await channel.send(embed = embed)
-        elif 365 > member_age >= 180:
-          embed.set_author(name = "This account is older than 6 month.")
-          await channel.send(embed = embed)
-        else:
-          embed.set_author(name = "This account is older than 1 year.")
-          await channel.send(embed = embed)
-    else:
-      embed = discord.Embed(color = random.choice(ListColours))
-      embed.set_thumbnail(url = f'{member.avatar_url}')
-      embed.add_field(name = "Server username:", value = f"{member}")
-      embed.add_field(name = "Member ID:", value = member.id, inline = False)
-      embed.add_field(name = "Created at:", value = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p"), inline = False)
-      joined_at = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p")
-      precise_member_age = datetime.utcnow() - member.created_at
-      member_age = precise_member_age.days   #in days
-      embed.add_field(name = "Joined at:", value = joined_at, inline = False)
-      year = int(member_age / 365) 
-      month = int((member_age % 365) / 30) 
-      days = (member_age % 365) % 30
-      embed.add_field(name = "Account age:", value = f'{year} year(s), {month} month(s), {days} day(s)')
-      embed.add_field(name = "Join Position:", value = len(list(member.guild.members)), inline = False)
-      embed.set_footer(text = "All times are in GMT to avoid any confusion.")
-      channel = bot.get_channel(int(result[0]))
-      guild = member.guild
-      #muted_role = guild.get_role(int(result1[0]))
-      #notify_role = guild.get_role(int(result2[0]))
-      cursor.execute(f"SELECT alt_age FROM main WHERE guild_id = {member.guild.id}")
-      result3 = cursor.fetchone()
-      if result3[0] is not None:
-        altage = int(result3[0])
-        if member_age <= altage:
-          embed.set_author(name = f"Suspicious! Account age less than {altage} days!")
-          await channel.send(embed = embed)
-        elif altage < member_age < 30:
-          embed.set_author(name = "Account age less than 30 days!")
-          await channel.send(embed = embed)
-        elif 90 > member_age >= 30:
-          embed.set_author(name = "This account is older than 1 month.")
-          await channel.send(embed = embed)
-        elif 180 > member_age >= 90:
-          embed.set_author(name = "This account is older than 3 month.")
-          await channel.send(embed = embed)
-        elif 365 > member_age >= 180:
-          embed.set_author(name = "This account is older than 6 month.")
-          await channel.send(embed = embed)
-        else:
-          embed.set_author(name = "This account is older than 1 year.")
-          await channel.send(embed = embed)
-      else:
-        altage = 7
-        if member_age <= altage:
-          embed.set_author(name = "Suspicious! Account age less than 1 week!")
-          await channel.send(embed = embed)
-        elif altage < member_age < 30:
-          embed.set_author(name = "Account age less than 30 days!")
-          await channel.send(embed = embed)
-        elif 90 > member_age >= 30:
-          embed.set_author(name = "This account is older than 1 month.")
-          await channel.send(embed = embed)
-        elif 180 > member_age >= 90:
-          embed.set_author(name = "This account is older than 3 month.")
-          await channel.send(embed = embed)
-        elif 365 > member_age >= 180:
-          embed.set_author(name = "This account is older than 6 month.")
-          await channel.send(embed = embed)
-        else:
-          embed.set_author(name = "This account is older than 1 year.")
-          await channel.send(embed = embed)
-  else:
-    return
+	guild = member.guild
+	db = sqlite3.connect("db.sqlite")
+	cursor = db.cursor()
+
+	cursor.execute(f"SELECT channel_id FROM main WHERE guild_id = {member.guild.id}")
+	channelid_raw = cursor.fetchone()
+	if channelid_raw[0]:
+		channel = guild.get_channel(int(channelid_raw[0]))
+	else:
+		channel = None
+
+	"""
+	cursor.execute(f"SELECT muted_role FROM main WHERE guild_id = {member.guild.id}")
+	muteid_raw = cursor.fetchone()
+	if muteid_raw[0]:
+		muted_role = guild.get_role(int(muteid_raw[0]))
+	else:
+		muted_role = None
+	"""
+
+	cursor.execute(f"SELECT notify FROM main WHERE guild_id = {member.guild.id}")
+	notifyid_raw = cursor.fetchone()
+	if notifyid_raw[0]:
+		notify_role = guild.get_role(int(notifyid_raw[0]))
+	else:
+		notify_role = None
+
+
+	cursor.execute(f"SELECT alt_age FROM main WHERE guild_id = {member.guild.id}")
+	altage_raw = cursor.fetchone()
+	if altage_raw[0]:
+		altage = int(altage_raw[0])
+	else:
+		altage = 7
+
+	joined_at = member.joined_at.strftime("%a, %#d %B %Y, %I:%M %p")
+	precise_member_age = datetime.utcnow() - member.created_at
+	member_age = precise_member_age.days	 #in days
+
+	year = int(member_age / 365) 
+	month = int((member_age % 365) / 30) 
+	days = (member_age % 365) % 30
+
+	embed = discord.Embed(color = random.choice(ListColours))
+	embed.set_thumbnail(url = f'{member.avatar_url}')
+	embed.add_field(name = "Server username:", value = f"{member}")
+	embed.add_field(name = "Member ID:", value = member.id, inline = False)
+	embed.add_field(name = "Created at:", value = member.created_at.strftime("%a, %#d %B %Y, %I:%M %p"), inline = False)
+	embed.add_field(name = "Joined at:", value = joined_at, inline = False)
+	embed.add_field(name = "Account age:", value = f'{year} year(s), {month} month(s), {days} day(s)')
+	embed.add_field(name = "Join Position:", value = len(list(member.guild.members)), inline = False)
+	embed.set_footer(text = "All times are in GMT to avoid any confusion.")
+
+	if channel == None:
+		return
+
+	else:
+		if member_age <= altage:
+			if notify_role == None:
+				embed.set_author(name = f"Suspicious! Account age less than {altage} days!")
+				await channel.send(embed = embed)
+
+			else:
+				if notify_role.mentionable:
+					embed.set_author(name = f"Suspicious! Account age less than {altage} days!")
+					await channel.send(notify_role.mention, embed = embed)
+				else:
+					await notify_role.edit(mentionable = True)
+					embed.set_author(name = f"Suspicious! Account age less than {altage} days!")
+					await channel.send(notify_role.mention, embed = embed)
+					await notify_role.edit(mentionable = False)
+
+		elif altage < member_age < 30:
+			embed.set_author(name = "Account age less than 30 days!")
+			await channel.send(embed = embed)
+
+		elif 90 > member_age >= 30:
+			embed.set_author(name = "This account is older than 1 month.")
+			await channel.send(embed = embed)
+
+		elif 180 > member_age >= 90:
+			embed.set_author(name = "This account is older than 3 month.")
+			await channel.send(embed = embed)
+
+		elif 365 > member_age >= 180:
+			embed.set_author(name = "This account is older than 6 month.")
+			await channel.send(embed = embed)
+
+		else:
+			embed.set_author(name = "This account is older than 1 year.")
+			await channel.send(embed = embed)
 
 @bot.command()
 @commands.has_permissions(administrator = True)
@@ -264,8 +211,8 @@ async def setchannel(ctx, channel: discord.TextChannel = None):
 
 @setchannel.error
 async def setchannel_error(ctx, error):
-    if isinstance(error, commands.CheckFailure):
-        await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
+		if isinstance(error, commands.CheckFailure):
+				await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
 
 @bot.command()
 @commands.has_permissions(administrator = True)
@@ -301,30 +248,30 @@ async def setage(ctx, age: int = None):
 
 @setage.error
 async def setage_error(ctx, error):
-    if isinstance(error, commands.CheckFailure):
-        await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
+		if isinstance(error, commands.CheckFailure):
+				await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
 
 
 '''
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def setmute(ctx, role: discord.Role):
-  db = sqlite3.connect("db.sqlite")
-  cursor = db.cursor()
-  cursor.execute(f"SELECT muted_role FROM main WHERE guild_id = {ctx.guild.id}")
-  result = cursor.fetchone()
-  if result is None:
-    sql = ("INSERT INTO main(guild_id, muted_role) VALUES(?, ?)")
-    val = (ctx.guild.id, role.id)
-    await ctx.send(f'Mute role has been set to {role.mention}')
-  elif result is not None:
-    sql = ("UPDATE main SET muted_role = ? WHERE guild_id = ?")
-    val = (role.id, ctx.guild.id)
-    await ctx.send(f'muted role has been updated to {role.mention}')
-  cursor.execute(sql, val)
-  db.commit()
-  cursor.close()
-  db.close()
+	db = sqlite3.connect("db.sqlite")
+	cursor = db.cursor()
+	cursor.execute(f"SELECT muted_role FROM main WHERE guild_id = {ctx.guild.id}")
+	result = cursor.fetchone()
+	if result is None:
+		sql = ("INSERT INTO main(guild_id, muted_role) VALUES(?, ?)")
+		val = (ctx.guild.id, role.id)
+		await ctx.send(f'Mute role has been set to {role.mention}')
+	elif result is not None:
+		sql = ("UPDATE main SET muted_role = ? WHERE guild_id = ?")
+		val = (role.id, ctx.guild.id)
+		await ctx.send(f'muted role has been updated to {role.mention}')
+	cursor.execute(sql, val)
+	db.commit()
+	cursor.close()
+	db.close()
 '''
 
 @bot.command()
@@ -361,26 +308,26 @@ async def setnotify(ctx, role: discord.Role = None):
 
 @setnotify.error
 async def setnotify_error(ctx, error):
-    if isinstance(error, commands.CheckFailure):
-        await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
+		if isinstance(error, commands.CheckFailure):
+				await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
 
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def setprefix(ctx, prefix = None):
-  db = sqlite3.connect("db.sqlite")
-  cursor = db.cursor()
-  cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {ctx.guild.id}")
-  result = cursor.fetchone()
-  if prefix is None:
-    await ctx.send(f'{ctx.author.mention} the current prefix for this server is `{result[0]}`.')
-  elif prefix is not None:
-    sql = ("UPDATE main SET prefix = ? WHERE guild_id = ?")
-    val = (prefix, ctx.guild.id)
-    await ctx.send(f'{ctx.author.mention} the prefix has been successfully set to `{prefix}`')
-    cursor.execute(sql, val)
-    db.commit()
-    cursor.close()
-    db.close()
+	db = sqlite3.connect("db.sqlite")
+	cursor = db.cursor()
+	cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {ctx.guild.id}")
+	result = cursor.fetchone()
+	if prefix is None:
+		await ctx.send(f'{ctx.author.mention} the current prefix for this server is `{result[0]}`.')
+	elif prefix is not None:
+		sql = ("UPDATE main SET prefix = ? WHERE guild_id = ?")
+		val = (prefix, ctx.guild.id)
+		await ctx.send(f'{ctx.author.mention} the prefix has been successfully set to `{prefix}`')
+		cursor.execute(sql, val)
+		db.commit()
+		cursor.close()
+		db.close()
 
 @bot.command()
 @commands.has_permissions(administrator = True)
@@ -423,8 +370,8 @@ async def whois(ctx, member: discord.Member = None):
 
 @whois.error
 async def whois_error(ctx, error):
-    if isinstance(error, commands.CheckFailure):
-        await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
+		if isinstance(error, commands.CheckFailure):
+				await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
 
 @bot.command()
 async def invite(ctx):
@@ -461,31 +408,31 @@ async def botinfo(ctx):
 @bot.event
 async def on_guild_join(guild):
 
-  db = sqlite3.connect("db.sqlite")
-  cursor = db.cursor()
-  cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {guild.id}")
-  result = cursor.fetchone() 
-  if result is None:
-    sql = ("INSERT INTO main(guild_id, prefix) VALUES(?, ?)")
-    val = (guild.id, "ad!")
-  elif result is not None:
-    sql = ("UPDATE main SET prefix = ? WHERE guild_id = ?")
-    val = ("ad!", guild.id)
-  cursor.execute(sql, val)
-  db.commit()
-  cursor.close()
-  db.close()
+	db = sqlite3.connect("db.sqlite")
+	cursor = db.cursor()
+	cursor.execute(f"SELECT prefix FROM main WHERE guild_id = {guild.id}")
+	result = cursor.fetchone() 
+	if result is None:
+		sql = ("INSERT INTO main(guild_id, prefix) VALUES(?, ?)")
+		val = (guild.id, "ad!")
+	elif result is not None:
+		sql = ("UPDATE main SET prefix = ? WHERE guild_id = ?")
+		val = ("ad!", guild.id)
+	cursor.execute(sql, val)
+	db.commit()
+	cursor.close()
+	db.close()
 
-  embed = discord.Embed(colour = random.choice(ListColours))
-  embed.set_author(name = "Guild Joined")
-  embed.set_thumbnail(url = guild.icon_url)
-  embed.add_field(name = "Guild name:", value = guild.name, inline = False)
-  embed.add_field(name = "Guild ID:", value = guild.id, inline = False)
-  embed.add_field(name = "Guild owner:", value = guild.owner, inline = False)
-  embed.add_field(name = "Total server count:", value = len(bot.guilds), inline = False)
-  embed.add_field(name = "Member count:", value = len(guild.members), inline = False)
-  channel = bot.get_channel(699295182558068786)
-  await channel.send(embed = embed)
+	embed = discord.Embed(colour = random.choice(ListColours))
+	embed.set_author(name = "Guild Joined")
+	embed.set_thumbnail(url = guild.icon_url)
+	embed.add_field(name = "Guild name:", value = guild.name, inline = False)
+	embed.add_field(name = "Guild ID:", value = guild.id, inline = False)
+	embed.add_field(name = "Guild owner:", value = guild.owner, inline = False)
+	embed.add_field(name = "Total server count:", value = len(bot.guilds), inline = False)
+	embed.add_field(name = "Member count:", value = len(guild.members), inline = False)
+	channel = bot.get_channel(699295182558068786)
+	await channel.send(embed = embed)
 
 @bot.event
 async def on_guild_remove(guild):
@@ -513,147 +460,155 @@ async def knownerrors(ctx):
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def fetchalts(ctx, arg: int):
-  msg = await ctx.send(f'<a:bot_offline:700602112949747772> Fetching accounts younger than `{arg}` days.\nIf the list is long, it may cause a big embed to popup in this channel.\nReact with a <a:online:700609324602490941> to confirm.\nThe reaction confirmation will timeout in 60 seconds.')
-  await msg.add_reaction('<a:online:700609324602490941>')
+	msg = await ctx.send(f'<a:bot_offline:700602112949747772> Fetching accounts younger than `{arg}` days.\nIf the list is long, it may cause a big embed to popup in this channel.\nReact with a <a:online:700609324602490941> to confirm.\nThe reaction confirmation will timeout in 60 seconds.')
+	await msg.add_reaction('<a:online:700609324602490941>')
 
-  def check(reaction, user):
-    return user == ctx.author and str(reaction.emoji) == '<a:online:700609324602490941>'
+	def check(reaction, user):
+		return user == ctx.author and str(reaction.emoji) == '<a:online:700609324602490941>'
 
-  try:
-    reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
-  except asyncio.TimeoutError:
-    await ctx.send("Reaction timed out.")
-    await msg.remove_reaction('<a:online:700609324602490941>', bot.user)
-  else:
-    if ctx.author.id == 428185775910420480:
-        members = ctx.guild.members
-        count = 1
-        page = 1
-        embed = discord.Embed(title = "S.No.           ID               age(in days)", color = random.choice(ListColours))
-        embed.set_footer(text = f"Page number: {page}")
-        for member in members:
-            member_age = datetime.utcnow() - member.created_at
-            days = member_age.days
-            if days < arg:
-              if count > 10:
-                if page == 1:
-                  await msg.remove_reaction('<a:online:700609324602490941>', bot.user)
-                  await msg.edit(embed = embed)
-                  page = page + 1
-                  await msg.add_reaction('<:next:709326566945062934>')
+	try:
+		reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check)
+	except asyncio.TimeoutError:
+		await ctx.send("Reaction timed out.")
+		await msg.remove_reaction('<a:online:700609324602490941>', bot.user)
+	else:
+		if ctx.author.id == 428185775910420480:
+				members = ctx.guild.members
+				count = 1
+				page = 1
+				embed = discord.Embed(title = "S.No.					 ID							 age(in days)", color = random.choice(ListColours))
+				embed.set_footer(text = f"Page number: {page}")
+				for member in members:
+						member_age = datetime.utcnow() - member.created_at
+						days = member_age.days
+						if days < arg:
+							if count > 10:
+								if page == 1:
+									await msg.remove_reaction('<a:online:700609324602490941>', bot.user)
+									await msg.edit(embed = embed)
+									page = page + 1
+									await msg.add_reaction('<:next:709326566945062934>')
 
-                  def check1(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
-                  
-                  try:
-                    reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
-                  except asyncio.TimeoutError:
-                    await msg.remove_reaction('<:next:709326566945062934>', bot.user)
-                  else:
-                      embed = discord.Embed(title = "S.No.           ID               age(in days)", color = random.choice(ListColours))
-                      embed.set_footer(text = f"Page number: {page}")
-                      count = 1
-                else:
-                  await msg.edit(embed = embed)
+									def check1(reaction, user):
+										return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
+									
+									try:
+										reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
+									except asyncio.TimeoutError:
+										await msg.remove_reaction('<:next:709326566945062934>', bot.user)
+									else:
+											embed = discord.Embed(title = "S.No.					 ID							 age(in days)", color = random.choice(ListColours))
+											embed.set_footer(text = f"Page number: {page}")
+											count = 1
+								else:
+									await msg.edit(embed = embed)
 
-                  def check1(reaction, user):
-                    return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
-                  
-                  try:
-                    reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
-                  except asyncio.TimeoutError:
-                    await msg.remove_reaction('<:next:709326566945062934>', bot.user)
-                  else:
-                    page = page + 1
-                    embed = discord.Embed(title = "S.No.           ID               age(in days)", color = random.choice(ListColours))
-                    embed.set_footer(text = f"Page number: {page}")
-                    count = 1
-              else:
-                embed.add_field(name = f"{count}.    {member.id}     -     {days}", value = f'{member.name}#{member.discriminator}', inline = False)
-                count += 1
-        if count <= 10:
-            await msg.edit(embed = embed)
-            await msg.remove_reaction('<:next:709326566945062934>', bot.user)
-        else:
-            return
-    else:
-        if arg < 90:
-            members = ctx.guild.members
-            count = 1
-            page = 1
-            embed = discord.Embed(title = "S.No.     -      ID        -       age(in days)", color = random.choice(ListColours))
-            embed.set_footer(text = f"Page number: {page}")
-            for member in members:
-                member_age = datetime.utcnow() - member.created_at
-                days = member_age.days
-                if days < arg:
-                  if count > 10:
-                    if page == 1:
-                      await msg.remove_reaction('<a:online:700609324602490941>', bot.user)
-                      await msg.edit(embed = embed)
-                      page = page + 1
-                      await msg.add_reaction('<:next:709326566945062934>')
+									def check1(reaction, user):
+										return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
+									
+									try:
+										reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
+									except asyncio.TimeoutError:
+										await msg.remove_reaction('<:next:709326566945062934>', bot.user)
+									else:
+										page = page + 1
+										embed = discord.Embed(title = "S.No.					 ID							 age(in days)", color = random.choice(ListColours))
+										embed.set_footer(text = f"Page number: {page}")
+										count = 1
+							else:
+								embed.add_field(name = f"{count}.		{member.id}		 -		 {days}", value = f'{member.name}#{member.discriminator}', inline = False)
+								count += 1
+				if count <= 10:
+						await msg.edit(embed = embed)
+						await msg.remove_reaction('<:next:709326566945062934>', bot.user)
+				else:
+						return
+		else:
+				if arg < 90:
+						members = ctx.guild.members
+						count = 1
+						page = 1
+						embed = discord.Embed(title = "S.No.		 -			ID				-			 age(in days)", color = random.choice(ListColours))
+						embed.set_footer(text = f"Page number: {page}")
+						for member in members:
+								member_age = datetime.utcnow() - member.created_at
+								days = member_age.days
+								if days < arg:
+									if count > 10:
+										if page == 1:
+											await msg.remove_reaction('<a:online:700609324602490941>', bot.user)
+											await msg.edit(embed = embed)
+											page = page + 1
+											await msg.add_reaction('<:next:709326566945062934>')
 
-                      def check1(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
-                  
-                      try:
-                        reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
-                      except asyncio.TimeoutError:
-                        await msg.remove_reaction('<:next:709326566945062934>', bot.user)
-                      else:
-                        embed = discord.Embed(title = "S.No.           ID               age(in days)", color = random.choice(ListColours))
-                        embed.set_footer(text = f"Page number: {page}")
-                        count = 1
-                    else:
-                      await msg.edit(embed = embed)
+											def check1(reaction, user):
+												return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
+									
+											try:
+												reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
+											except asyncio.TimeoutError:
+												await msg.remove_reaction('<:next:709326566945062934>', bot.user)
+											else:
+												embed = discord.Embed(title = "S.No.					 ID							 age(in days)", color = random.choice(ListColours))
+												embed.set_footer(text = f"Page number: {page}")
+												count = 1
+										else:
+											await msg.edit(embed = embed)
 
-                      def check1(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
-                  
-                      try:
-                        reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
-                      except asyncio.TimeoutError:
-                        await msg.remove_reaction('<:next:709326566945062934>', bot.user)
-                      else:
-                        page = page + 1
-                        embed = discord.Embed(title = "S.No.           ID               age(in days)", color = random.choice(ListColours))
-                        embed.set_footer(text = f"Page number: {page}")
-                        count = 1
-                  else:
-                    embed.add_field(name = f"{count}.    {member.id}     -     {days}", value = f'{member.name}#{member.discriminator}', inline = False)
-                    count += 1
-            if count <= 10:
-              await msg.edit(embed = embed)
-            else:
-              return
-        else: 
-            await ctx.send("The `days` argument cannot be higher than 90.\nOnly the bot owner, `4041RebL`, may enter the `[day]` parameter's value higher than 90 days.\nPlease contanct him incase you need to use this command.\nThis is to prevent spam")
+											def check1(reaction, user):
+												return user == ctx.author and str(reaction.emoji) == '<:next:709326566945062934>'
+									
+											try:
+												reaction, user = await bot.wait_for('reaction_add', timeout=60.0, check=check1)
+											except asyncio.TimeoutError:
+												await msg.remove_reaction('<:next:709326566945062934>', bot.user)
+											else:
+												page = page + 1
+												embed = discord.Embed(title = "S.No.					 ID							 age(in days)", color = random.choice(ListColours))
+												embed.set_footer(text = f"Page number: {page}")
+												count = 1
+									else:
+										embed.add_field(name = f"{count}.		{member.id}		 -		 {days}", value = f'{member.name}#{member.discriminator}', inline = False)
+										count += 1
+						if count <= 10:
+							await msg.edit(embed = embed)
+						else:
+							return
+				else: 
+						await ctx.send("The `days` argument cannot be higher than 90.\nOnly the bot owner, `4041RebL`, may enter the `[day]` parameter's value higher than 90 days.\nPlease contanct him incase you need to use this command.\nThis is to prevent spam")
 
 @fetchalts.error
 async def fetchalts_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('Please proved a `[days]` argument.\nFor more information, use `ad!help fetchalts`.')
-    if isinstance(error, commands.CheckFailure):
-        await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
+		if isinstance(error, commands.MissingRequiredArgument):
+				await ctx.send('Please proved a `[days]` argument.\nFor more information, use `ad!help fetchalts`.')
+		if isinstance(error, commands.CheckFailure):
+				await ctx.send('You do not have the permissions to invoke this command.\nRequired permission: `Administrator`.')
 
 @bot.command()
 async def ping(ctx):
-    before = time.monotonic()
-    message = await ctx.send("Pong!")
-    ping = (time.monotonic() - before) * 1000
-    await message.edit(content=f"Pong! `{int(ping)} ms`")
+		before = time.monotonic()
+		message = await ctx.send("Pong!")
+		ping = (time.monotonic() - before) * 1000
+		await message.edit(content=f"Pong! `{int(ping)} ms`")
 
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def members(ctx, *, role: discord.Role):
-  guild = ctx.guild
-  members = guild.members
-  count = 1
-  for member in members:
-    if role in member.roles:
-      await ctx.send(f"{count}       -           {member}")
-      count += 1
+	guild = ctx.guild
+	members = guild.members
+	string = ""
+	space = "			"
+	count = 1
+	for member in members:
+		if role in member.roles:
+			if count == 1:
+				string = string + member.mention + space
+				count +=1
+			else:
+				string = f"{string}\n{member.mention}{space}"
+	embed = discord.Embed(color = random.choice(ListColours), description = string)
+	embed.set_author(name = "Members in "+role.name)
+	await ctx.send(embed = embed)
 
 @bot.command()
 async def check(ctx, id: int):
@@ -672,12 +627,12 @@ async def check(ctx, id: int):
 			alt_age = cursor.fetchone()
 
 			if channel_id[0]:
-				channel = guild.get_channel(int(channel_id[0])).mention
+				channel = "#"+guild.get_channel(int(channel_id[0])).name
 			else:
 				channel = "Not Set"
 
 			if notify_id[0]:
-				notify = guild.get_role(int(notify_id[0])).mention 
+				notify = "@"+guild.get_role(int(notify_id[0])).name
 			else:
 				notify = "Not Set"
 
@@ -690,10 +645,16 @@ async def check(ctx, id: int):
 			embed.set_author(name = guild.name)
 			embed.set_thumbnail(url = guild.icon_url)
 			embed.add_field(name = "Prefix:", value = prefix, inline = False)
-			embed.add_field(name = "Feeds Channel:", value = channel, inline = False)
-			embed.add_field(name = "Notify role:", value = notify, inline = False)
+			embed.add_field(name = "Feeds Channel:", value = "`"+ channel +"`", inline = False)
+			embed.add_field(name = "Notify role:", value = "`"+ notify +"`", inline = False)
 			embed.add_field(name = "Alt age:", value = age, inline = False)
 			await ctx.send(embed = embed)
+
+@bot.command()
+async def upvote(ctx):
+	embed = discord.Embed(color = random.choice(ListColours), description = "**[Discord.Bots.gg](https://discord.bots.gg/bots/699174992046456832)**\n\n**[Discord Boats](https://discord.boats/bot/699174992046456832)**\n\n**[Botlist.space](https://botlist.space/bot/699174992046456832)**\n\n**[Bots for Discord](https://botsfordiscord.com/bot/699174992046456832)**")
+	embed.set_author(name = "Bot listing sites", icon_url = bot.user.avatar_url)
+	await ctx.send(embed = embed)
 
 keep_alive()
 token = os.environ.get("TOKEN")

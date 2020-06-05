@@ -10,7 +10,8 @@ name = "alt-detector"
 version = "0.1.0"
 [tool.poetry.dependencies]
 discord = "^1.0"
-flask = "^1.1"
-python = "^3.7"
 discord-webhook = "^0.8.0"
+flask = "^1.1"
+psutil = "^5.7"
+python = "^3.8"
 [tool.poetry.dev-dependencies]
