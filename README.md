@@ -20,4 +20,4 @@ Pre-requisits:
 # I have those, how do I get the bot up and running?
 This part is simple, open `settings.json` using your editor, and place the values.
 When you're done with it, run the `main.py` file or use `python main.py` from your terminal to run the bot.
-If the bot replies ** `The bot is ready.` ** in the terminal, well you know what it means..
+If the bot replies `The bot is ready.` in the terminal, well you know what it means..
