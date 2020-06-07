@@ -12,7 +12,7 @@ The bot makes your job a **LOT** easier by notifying your staff. There won't be 
 
 # Now what do I need before setting up the bot?
 
-Pre-requisits:
+Pre-requisites:
 - Python 3.6 *anything above version 3.6 will work*
 - Discord.py *after installing python, use `pip install discord`*
 - A good editor to edit the codes. *For example: Visual studio code, PyCharm etc.*
