@@ -8,7 +8,7 @@ The bot logs all the member joins in a separate channel and notifies the staff i
 Ofcourse no, on Discord, there is practically no way you can trace alts with 100% accuracy. But if the alternative account is a newly built, the bot can identify it and notify the staff. Here's a catch too, the account obviously has a chance to be an actual new discord user. In that case, your intelligent staff who were just notified will sort it out.
 
 # How does it help me then?
-The bot makes your job a **LOT** easier by notifying your staff. There won't be a single new account sneaking up your server without you and your staff knowing when this bot is on watch.
+The bot makes your job **ALOT** easier by notifying your staff. There won't be a single new account sneaking up your server without you and your staff knowing when this bot is on watch.
 
 # Now what do I need before setting up the bot?
 
