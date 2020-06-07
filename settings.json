@@ -1,0 +1,9 @@
+{
+	"prefix":"ad!",
+	"TOKEN":"your-bot-token-here",
+	"server_id":"your-server-id",
+	"log_channel":"your-log-channel-id",
+	"notify_role":"your-notify-role-id",
+	"alt_age":7,
+	"custom_status":"None" 
+}
