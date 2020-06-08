@@ -10,10 +10,6 @@ class Moderation(commands.Cog):
     self.bot = bot
 
   @commands.command()
-  async def testset(self, ctx):
-    await ctx.send(embed = discord.Embed(title = "This is embed colour test", colour = random.choice(ListColours), description = "Try using this command multiple times.\nThe colour of the embed must be randomized!"))
-
-  @commands.command()
   @commands.has_permissions(ban_members = True)
   async def ban(self, ctx, member: discord.Member = None, *, reason = None):
     if reason == None:
