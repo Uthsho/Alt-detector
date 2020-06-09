@@ -1,3 +1,5 @@
+If you're facing any difficulties in getting your bot online and working, please [create an issue](https://github.com/4041RebL/Alt-detector/issues) here. I would be happy to help you out.
+
 # What is this bot?
 This is a discord.py bot built to detect any new account that joins your server.
 
