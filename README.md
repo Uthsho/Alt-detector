@@ -16,7 +16,7 @@ The bot makes your job **ALOT** easier by notifying your staff. There won't be a
 
 Pre-requisites:
 - Python 3.6 *anything above version 3.6 will work*
-- Discord.py *after installing python, use `pip install discord`*
+- Discord.py *after installing python, use win+R, and type `cmd` and press enter. On the console, run the command `pip install discord` to install the discord.py library which is necessary to run the bot.*
 - A good editor to edit the codes. *For example: Visual studio code, PyCharm etc.*
 
 # I have those, how do I get the bot up and running?
